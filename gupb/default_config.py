@@ -4,7 +4,12 @@ from gupb.controller.cynamonka.cynamonka import CynamonkaController
 from gupb.model.arenas import ArenaDescription
 from gupb.scripts import arena_generator
 
+<<<<<<< HEAD
 cynamonka_controller = CynamonkaController("CynamonkaController")
+=======
+
+keyboard_controller = keyboard.KeyboardController()
+>>>>>>> upstream/um-2023-zima
 
 CONFIGURATION = {
     'arenas': arena_generator.generate_arenas(1),
@@ -14,9 +19,6 @@ CONFIGURATION = {
         random.RandomController("Bob"),
         random.RandomController("Cecilia"),
         random.RandomController("Darius"),
-        random.RandomController("Asd"),
-        random.RandomController("Bo"),
-        random.RandomController("Ce"),
     ],
     'start_balancing': False,
     'visualise': True,

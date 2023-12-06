@@ -25,7 +25,6 @@ POSSIBLE_ACTIONS = [
 ]
 
 
-
 TerrainDescription = Dict[Coords, tiles.TileDescription]
 
 class CynamonkaController(controller.Controller):
