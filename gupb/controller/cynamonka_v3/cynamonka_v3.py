@@ -13,7 +13,7 @@ from gupb.model.coordinates import Coords
 from gupb.model.weapons import Knife, Axe, Bow, Sword, Amulet
 
 """
-NAJNOWSZA KONFIGURACJA Z UCIEKANIEM
+stara lekko ulepszona konfig
 """
 POSSIBLE_ACTIONS = [
     characters.Action.TURN_LEFT,
@@ -188,7 +188,7 @@ class CynamonkaController(controller.Controller):
         escape_area = self.get_escape_area(escape_range)
 
         for coords, description in self.discovered_arena.items():
-            if description.character and description.character.controller_name != "CynamonkaController" and coords in escape_area:
+            if description.character and description.character.controller_name != "CynamonkaController3" and coords in escape_area:
                 # print("zdrowie przeciwnika: " + str(description.character.health) + " moje zdrowie : " + str(self.discovered_arena[self.position].character.health))
                 if description.character.health > self.discovered_arena[self.position].character.health:
                     enemy_direction = description.character.facing.value
@@ -427,7 +427,7 @@ class CynamonkaController(controller.Controller):
                 return False
         for coords, description in self.discovered_arena.items():
             
-            if description.character and description.character.controller_name != "CynamonkaController" and coords in attackable_area:
+            if description.character and description.character.controller_name != "CynamonkaController3" and coords in attackable_area:
                 if self.current_weapon == weapons.Amulet:
                     self.times_in_row_amulet+=1
                 else:

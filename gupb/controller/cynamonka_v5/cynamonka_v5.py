@@ -333,7 +333,7 @@ class CynamonkaController(controller.Controller):
                 return False
         for coords, description in self.discovered_arena.items():
             
-            if description.character and description.character.controller_name != "CynamonkaController" and coords in attackable_area:
+            if description.character and description.character.controller_name != "CynamonkaController5" and coords in attackable_area:
                 if self.current_weapon == weapons.Amulet:
                     self.times_in_row_amulet+=1
                 else:
@@ -429,4 +429,4 @@ class CynamonkaController(controller.Controller):
 
     @property
     def preferred_tabard(self) -> characters.Tabard:
-        return characters.Tabard.PINK
+        return characters.Tabard.LIME
