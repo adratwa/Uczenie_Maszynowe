@@ -20,7 +20,7 @@ from gupb.controller import r2d2
 from gupb.scripts import arena_generator
 
 CONFIGURATION = {
-    'arenas': arena_generator.generate_arenas(1, arena_generator.random_size_generator()),
+    'arenas': arena_generator.generate_arenas(50, arena_generator.random_size_generator()),
     'controllers': [
         alpha_gupb.AlphaGUPB("AlphaGUPB"),
         ancymon.AncymonController("Ancymon"),
@@ -29,9 +29,9 @@ CONFIGURATION = {
         # bob.FSMBot(),
         # batman.BatmanHeuristicsController('Batman'),
         cynamonka.CynamonkaController("Cynamonka"),
-        # cynamonka_v2.CynamonkaController("Cynamonka2"),
-        # cynamonka_v3.CynamonkaController("Cynamonka3"),
-        # cynamonka_v5.CynamonkaController("Cynamonka5"),
+        cynamonka_v2.CynamonkaController("Cynamonka2"),
+        cynamonka_v3.CynamonkaController("Cynamonka3"),
+        cynamonka_v5.CynamonkaController("Cynamonka5"),
         forrest_gump.ForrestGumpController("Forrest Gump"),
         # frog.FrogController('Frog'),
         krombopulos.KrombopulosMichaelController(),
@@ -43,7 +43,7 @@ CONFIGURATION = {
         roger.Roger('1'),
     ],
     'start_balancing': False,
-    'visualise': True,
+    'visualise': False,
     'show_sight': True,
-    'runs_no': 500,
+    'runs_no': 250,
 }

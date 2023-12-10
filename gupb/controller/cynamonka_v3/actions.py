@@ -96,7 +96,7 @@ class Actions:
                 if description.character.health > self.my_knowledge.health:
                     enemy_direction = description.character.facing.value
                     # Uciekaj od przeciwnika
-                    escape_position = coordinates.Coords(self.my_knowledge.position[0] + enemy_direction[0], self.my_knowledge.position[1] + enemy_direction[1])
+                    escape_position = coordinates.Coords(self.position[0] + enemy_direction[0], self.position[1] + enemy_direction[1])
                     if escape_position in self.my_knowledge.map.walkable_area:
                         # print("zwracam uciekanie do : " + str(escape_position))
                         return self.go_in_the_target_direction(escape_position)

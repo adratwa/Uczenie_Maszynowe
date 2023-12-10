@@ -1,10 +1,10 @@
-from .cynamonka_v3 import CynamonkaController
+from .cynamonka import CynamonkaController
 from gupb.model.arenas import ArenaDescription
 __all__ = [
-    'CynamonkaController3',
+    'CynamonkaController',
     'POTENTIAL_CONTROLLERS'
 ]
 # TODO: tu chyba przed zrobieniem PR trzeba baedzie to zmeinic
 POTENTIAL_CONTROLLERS = [
-    CynamonkaController("CynamonkaController3"),
+    CynamonkaController("CynamonkaController"),
 ]

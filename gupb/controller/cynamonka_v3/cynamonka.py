@@ -14,7 +14,7 @@ from gupb.model.weapons import Knife, Axe, Bow, Sword, Amulet
 from gupb.controller.cynamonka.brain import Map, Decider
 
 """
-wersja z nowym path finder
+bez ataku
 """
 POSSIBLE_ACTIONS = [
     characters.Action.TURN_LEFT,

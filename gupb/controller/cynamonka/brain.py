@@ -19,6 +19,7 @@ class Map:
         self.center = coordinates.Coords(round(self.size[0] / 2), round(self.size[1] / 2))
         self.walkable_area = []
         self.is_mist = False
+        self.mist_positions = []
 
     def update_discovered_arena(self, visible_tiles: Dict[Coords, tiles.Tile]):
         
@@ -47,7 +48,7 @@ class Map:
             self.terrain[coords] = new_tile_type()
             self.terrain[coords].loot = Map.weapon_converter(description.loot)
             self.terrain[coords].consumable = Map.poison_converter(description.consumable)
-            self.terrain[coords].effects = self.effects_converter(description.effects)
+            self.terrain[coords].effects = self.effects_converter(description.effects, coords)
             self.terrain[coords].character = description.character
             
 
@@ -101,13 +102,14 @@ class Map:
             return consumables.Potion
         return None
     
-    def effects_converter(self, effects_description):
+    def effects_converter(self, effects_description, coords):
         converted_effects = []
 
         for effect in effects_description:
             if effect.type == 'mist':
                 self.is_mist = True
                 converted_effects.append(effects.Mist)
+                self.mist_positions.append(coords)
         
         return converted_effects
     
@@ -236,7 +238,7 @@ class MyKnowledge:
                 self.times_in_row_amulet = 0
                 return False
         for coords, description in self.map.terrain.items():
-            if description.character and description.character.controller_name != "Cynamonka" and coords in attackable_area:
+            if description.character and description.character.controller_name != "Cynamonka" and coords in attackable_area and self.health >= description.character.health:
                 if self.current_weapon == weapons.Amulet:
                     self.times_in_row_amulet+=1
                 else:
@@ -269,72 +271,80 @@ class Decider:
     def find_the_best_action(self, knowledge: characters.ChampionKnowledge):
         try:
             self.my_knowledge.update_my_knowledge(knowledge)
-            new_action = Actions(self.my_knowledge)
+            path_finder = PathFinder(self.my_knowledge)
+            #path_finder.update_paths(self.my_knowledge.position)
+            new_action = Actions(self.my_knowledge, path_finder)
 
             # firstly go to poison
             if self.my_knowledge.can_collect_elixir(self.my_knowledge.position + self.my_knowledge.facing.value) and not self.my_knowledge.is_mist_at_position(self.my_knowledge.position + self.my_knowledge.facing.value):
-                print("collecting elixir")
+                #print("collecting elixir")
                 return POSSIBLE_ACTIONS[2] # go forward
     
             if self.my_knowledge.can_collect_elixir(self.my_knowledge.position + self.my_knowledge.facing.turn_right().value) and not self.my_knowledge.is_mist_at_position(self.my_knowledge.position + self.my_knowledge.facing.turn_right().value):
-                print("collecting elixir")
+                #print("collecting elixir")
                 return POSSIBLE_ACTIONS[6]  # Right
             
             if self.my_knowledge.can_collect_elixir(self.my_knowledge.position + self.my_knowledge.facing.turn_left().value) \
                     and not self.my_knowledge.is_mist_at_position(self.my_knowledge.position + self.my_knowledge.facing.turn_left().value):
-                print("collecting elixir")
+                #print("collecting elixir")
                 return POSSIBLE_ACTIONS[5]  # Left
 
             # then attack
             # TODO: add escaping
+            escape_action = new_action.run_away_from_enemies()
+            if escape_action:
+                return escape_action
             if self.my_knowledge.can_attack():
                 # print("inside can attack")
-                print("attack")
+                #print("attack")
                 return POSSIBLE_ACTIONS[3] # attack
             
             # collect weapon
             if self.my_knowledge.can_collect_weapon(self.my_knowledge.position + self.my_knowledge.facing.value) and not self.my_knowledge.is_mist_at_position(self.my_knowledge.position + self.my_knowledge.facing.value):
-                print("collect weapon")
+                #print("collect weapon")
                 return POSSIBLE_ACTIONS[2] # go forward
     
             if self.my_knowledge.can_collect_weapon(self.my_knowledge.position + self.my_knowledge.facing.turn_right().value) and not self.my_knowledge.is_mist_at_position(self.my_knowledge.position + self.my_knowledge.facing.turn_right().value):
-                print("collect weapon")
+                #print("collect weapon")
                 return POSSIBLE_ACTIONS[6]  # Right
             
             if self.my_knowledge.can_collect_weapon(self.my_knowledge.position + self.my_knowledge.facing.turn_left().value) and not self.my_knowledge.is_mist_at_position(self.my_knowledge.position + self.my_knowledge.facing.turn_left().value):
-                print("collect weapon")
+                #print("collect weapon")
                 return POSSIBLE_ACTIONS[5]  # Left
             
             # check if there is a mist
             if self.my_knowledge.map.is_mist:
                 if self.my_knowledge.map.menhir_position:
                     self.my_knowledge.times_in_row_amulet = 0
-                    print("going in menhir direction")
+                    #print("going in menhir direction")
                     return new_action.go_in_menhir_direction(self.my_knowledge.map.menhir_position)
                 else:
                     # TODO: dodaj tu uciekanie przed mgla
-                    return new_action.go_to_center_of_map()
+                    return new_action.go_randomly()
             else:
+                
                 poison_path = self.my_knowledge.find_path_to_poison_in_the_neighbourhood()
                 if poison_path and len(poison_path) < 7:
-                    print("going in the poison direction")
                     return new_action.go_in_the_target_direction(poison_path[-1])
                 
                 weapon_path = self.my_knowledge.find_path_to_weapon_in_the_neighbourhood()
                 if weapon_path and len(weapon_path) < 7:
-                    print("going in the weapon direction")
                     return new_action.go_in_the_target_direction(weapon_path[-1])
                 
                 if self.my_knowledge.map.menhir_position:
-                    print("going in menhir direction")
                     return new_action.go_in_menhir_direction(self.my_knowledge.map.menhir_position)
-                return new_action.go_to_center_of_map()
+                
+                return new_action.go_randomly()
         except Exception as e:
             # Handle exceptions or errors here
             traceback.print_exc()
             print(f"An error occurred: {e}")
             return new_action.go_randomly()
         
+    def should_run_away(self):
+        escape_action = self.run_away_from_enemies()
+        return escape_action is not None
+    
     def reset(self, arena_description: arenas.ArenaDescription) -> None:
         self.my_knowledge.reset(arena_description)
 
